@@ -28,21 +28,22 @@ public class ScannerDFA {
 
     //Prototype only ignore the shit inside
     public String runDFA(){
-        switch(currentState){
-            case "C":
-                if (Character.isDigit(currentChar)){
-                    updateDFA();
-                    currentState = "N";
-                }
-                switch(currentChar){
-                    case 'X':
-                        updateDFA();
-                        currentState = "A";
-                    case 'Y':
-                        updateDFA();
-                        currentState = "B";
-                }
-        }
+        //SAMPLE ONLY
+        // switch(currentState){
+        //     case "C":
+        //         if (Character.isDigit(currentChar)){
+        //             updateDFA();
+        //             currentState = "N";
+        //         }
+        //         switch(currentChar){
+        //             case 'X':
+        //                 updateDFA();
+        //                 currentState = "A";
+        //             case 'Y':
+        //                 updateDFA();
+        //                 currentState = "B";
+        //         }
+        // }
     }
 
     public String printTokenLexeme(){

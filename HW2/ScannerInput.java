@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
-public class ScannerInputPractice {
+public class ScannerInput {
 
     public static void main(String[] args) {
 
@@ -11,7 +11,7 @@ public class ScannerInputPractice {
         scanner.useDelimiter("\\Z");
         String a = scanner.next();
 
-        ScannerPractice myScanner = new ScannerPractice(a);
+        ScannerDFA myScanner = new ScannerDFA(a);
 
         try {
             File output = new File("output.txt");

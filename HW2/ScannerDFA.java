@@ -1,4 +1,4 @@
-public class ScannerPractice {
+public class ScannerDFA {
 
     //fields
     private String inputStream;

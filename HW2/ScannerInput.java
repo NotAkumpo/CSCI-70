@@ -20,10 +20,9 @@ public class ScannerInput {
 
                 //Output here, should still be formatted properly
                 while( !myScanner.printStream().isEmpty() && myScanner.showError() ){
-                    out.println();
+                    out.println(myScanner.printTokenLexeme());
                 }
                 out.close();
-
             }
             else {
                 System.out.println("An output file already exists. Please delete the current output file.");

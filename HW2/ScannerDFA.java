@@ -117,6 +117,9 @@ public class ScannerDFA {
         else {
             if (currentState == "E"){
                 currentState = "ASSIGN";
+            } 
+            else if (currentState == "B"){
+                currentState = "NUM";
             }
             tokenLexeme = currentState + "  " + currentToken; 
         }

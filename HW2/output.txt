@@ -1,11 +1,15 @@
-NUM  23345
 PLUS  +
-NUM  12
-MINUS  -
-NUM  23
-MINUS  -
 NUM  1
 MINUS  -
-NUM  234
-E  ==
-B  22222
+NUM  2
+PLUS  +
+NUM  1
+MINUS  -
+NUM  2
+PLUS  +
+NUM  334
+MINUS  -
+NUM  32
+PLUS  +
+NUM  23443
+Lexical Error reading character "_"

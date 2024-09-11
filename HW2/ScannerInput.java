@@ -16,29 +16,29 @@ public class ScannerInput {
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
-        scanner.useDelimiter("\\Z");
-        String a = scanner.next();
+        Scanner scanner = new Scanner(System.in); //Create a scanner (this scanner is different from the DFA Scanner) to read input from the console
+        scanner.useDelimiter("\\Z"); //setting the delimiter to read the entire input 
+        String a = scanner.next(); //store the input into a string variable called 'a'
 
-        ScannerDFA myScanner = new ScannerDFA(a);
+        ScannerDFA myScanner = new ScannerDFA(a); //creating a new scannerDFA object that makes use of the input string
 
         try {
-            File output = new File("output.txt");
-            if (output.createNewFile()) {
+            File output = new File("output.txt"); //creates a new file for the output from the scannerDFA
+            if (output.createNewFile()) { //double checks if the file does not exist and makes a new file if needed
                 PrintWriter out = new PrintWriter("output.txt");
 
-                //Output here, should still be formatted properly
+                //the program will continue printing as long as the printStream is not empty and no errors in the scannerDFA occur
                 while( !myScanner.printStream().isEmpty() && myScanner.showError() ){
-                    out.println(myScanner.printTokenLexeme());
+                    out.println(myScanner.printTokenLexeme()); //writes the token-lexeme pair to the output file
                 }
-                out.close();
+                out.close(); //close the PrintWriter after the writing is over
             }
             else {
-                System.out.println("An output file already exists. Please delete the current output file.");
+                System.out.println("An output file already exists. Please delete the current output file."); //if another output file exists, tells the user to delete it first 
             }
         } 
         catch (IOException e){
-            System.out.println("An error occurred.");
+            System.out.println("An error occurred."); //catches  any errors and displays an error message on the console
         }
 
 

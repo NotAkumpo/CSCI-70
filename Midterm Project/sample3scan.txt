@@ -70,4 +70,3 @@ RightParen  )
 Semicolon  ;
 Endif  ENDIF
 Semicolon  ;
-[ "If", "Identifier", "GreaterThan", "Identifier", "Colon", "Print", "LeftParen", "String", "RightParen", "Semicolon", "Endif", "Semicolon", "If", "Identifier", "GreaterThan", "Identifier", "And", "Identifier", "LTEqual", "Identifier", "And", "Identifier", "NotEqual", "Identifier", "Colon", "Print", "LeftParen", "String", "RightParen", "Semicolon", "Endif", "Semicolon", "If", "Identifier", "GreaterThan", "Identifier", "Or", "Identifier", "LTEqual", "Identifier", "Or", "Identifier", "NotEqual", "Identifier", "Colon", "Print", "LeftParen", "String", "RightParen", "Semicolon", "Endif", "Semicolon", "If", "Identifier", "GreaterThan", "Identifier", "And", "Identifier", "LTEqual", "Identifier", "Or", "Identifier", "NotEqual", "Identifier", "Colon", "Print", "LeftParen", "String", "RightParen", "Semicolon", "Endif", "Semicolon", "EndOfFile" ]

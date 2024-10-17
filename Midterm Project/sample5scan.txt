@@ -41,4 +41,3 @@ LeftParen  (
 String  "end of program"
 RightParen  )
 Semicolon  ;
-[ "Identifier", "Assign", "Number", "Semicolon", "Identifier", "Assign", "Number", "Semicolon", "Identifier", "Assign", "Identifier", "Plus", "Identifier", "Semicolon", "Identifier", "Assign", "Identifier", "Minus", "Identifier", "Semicolon", "Identifier", "Assign", "Identifier", "Minus", "Identifier", "Semicolon", "If", "Identifier", "GreaterThan", "Identifier", "Colon", "Print", "LeftParen", "String", "RightParen", "Semicolon", "Endif", "Semicolon", "Print", "LeftParen", "String", "RightParen", "Semicolon", "EndOfFile" ]

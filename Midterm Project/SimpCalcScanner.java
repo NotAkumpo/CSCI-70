@@ -10,7 +10,7 @@ public class SimpCalcScanner {
     private boolean noError;       // Error flag to track if there's been an error
     private boolean ongoingDFA;    // DFA running state flag
     private ArrayList<String> tokenIDs;   // List to store identified tokens
-    private int currentLine = 1;   // Track line numbers for error reporting
+
 
     // Constructor to initialize with an input stream
     public SimpCalcScanner(String inputStream) {
@@ -46,7 +46,6 @@ public class SimpCalcScanner {
             case "A":
                 // Handle whitespace and new lines
                 if (Character.isWhitespace(currentChar)) {
-                    if (currentChar == '\n') currentLine++;  // Track line numbers for errors
                     updateDFA();
                     break;
                 }
@@ -199,7 +198,7 @@ public class SimpCalcScanner {
                     currentState = "NotEqual"; // Not equal to
                     ongoingDFA = false;
                 } else {
-                    addError("Invalid sequence"); // Invalid character after '!'
+                    addError("Illegal character/character sequence"); // Invalid character after '!'
                     updateDFA(); // Skip the problematic character
                     currentState = "A"; // Reset to continue
                 }
@@ -373,7 +372,7 @@ public class SimpCalcScanner {
     }
 
     // Print the token and lexeme
-    public String printTokenLexeme() {
+    public String gettoken() {
         ongoingDFA = true; // Reset DFA flag
         currentState = "A"; // Reset state to the start
         currentToken = ""; // Clear current token
@@ -423,6 +422,7 @@ public class SimpCalcScanner {
             currentChar = inputStream.charAt(0); // Update current character
         }
     }
+
     // Method to retrieve the list of token IDs
     public ArrayList<String> getTokenIDs(){
         tokenIDs.add("EndOfFile");
@@ -432,7 +432,7 @@ public class SimpCalcScanner {
     // Add an error message to the token list
     private void addError(String errorMessage) {
         tokenIDs.add("Error"); // Add generic error
-        tokenIDs.add("Lexical Error: " + errorMessage + " (line #" + currentLine + ")"); // Detailed error
+        tokenIDs.add("Lexical Error: " + errorMessage); // Detailed error
         noError = false; // Set error flag to true
         ongoingDFA = false; // End current token processing
     }

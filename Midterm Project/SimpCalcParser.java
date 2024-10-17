@@ -6,16 +6,19 @@ import java.util.ArrayList;
 public class SimpCalcParser {
 
     //fields
-    private ArrayList<String> tokens;
-    PrintWriter out;
+    private ArrayList<String> tokens; //Contains all the token types produced by the Scanner
+    PrintWriter out; //Writes to output file
+    String fileName; //For the message when Parser is successful
 
     //constructor
-    public SimpCalcParser(ArrayList<String> tokens){
+    //Constructor also creates the output file for the Parser
+    public SimpCalcParser(ArrayList<String> tokens, String parserFileName, String fileName){
+        this.fileName = fileName;
         this.tokens = tokens;
         try {
-            File output = new File("output_parse.txt"); 
+            File output = new File(parserFileName); 
             if (output.createNewFile()) { 
-                out = new PrintWriter("output_parse.txt");
+                out = new PrintWriter(parserFileName);
             }
             else {
                 System.out.println("An output file for the parser already exists. Please delete this current file."); 
@@ -27,10 +30,11 @@ public class SimpCalcParser {
     }
 
     //methods
+    //Prg routine to start the Parser
     public void Prg(){
         Blk();
         if (tokens.get(0).equals("EndOfFile")){
-            out.println("Sample is a valid SimpCalc Program.");
+            out.println(fileName + " is a valid SimpCalc Program.");
             out.close();
         }
         else {
@@ -39,6 +43,7 @@ public class SimpCalcParser {
         }
     }
 
+    //Blk routine
     private void Blk(){
         if (tokens.get(0).equals("Identifier") || tokens.get(0).equals("Print") || tokens.get(0).equals("If")) {
             Stm();
@@ -46,23 +51,25 @@ public class SimpCalcParser {
         }
     }
 
+    //Stm routine
     private void Stm(){
-        if (tokens.get(0).equals("Identifier")){
-            tokens.remove(0);
+        //This is how tokens and sub-routines are handled for the entirety of the Parser
+        if (tokens.get(0).equals("Identifier")){ //When a token is find it goes into an if statement
+            tokens.remove(0); //The token then gets consumed and the subroutine moves on to the next token/sub-routine
             if (tokens.get(0).equals("Assign")){
                 tokens.remove(0);
                 Exp();
                 if (tokens.get(0).equals("Semicolon")){
                     tokens.remove(0);
-                    out.println("Statement Recognized.");
+                    out.println("Assignment Statement Recognized.");
                 }
                 else {
                     out.println("Parse Error: Semicolon expected.");
                     Error();
                 }
             }
-            else {
-                out.println("Parse Error: Assign expected.");
+            else { //Else statements are used to detect errors, ie. when a token is found when it's not in the sub-routine
+                out.println("Parse Error: Assign expected."); 
                 Error();
             }
         }
@@ -114,6 +121,7 @@ public class SimpCalcParser {
         }
     }
 
+    //ArgFollow routine
     private void ArgFollow(){
         if (tokens.get(0).equals("Comma")){
             tokens.remove(0);
@@ -122,6 +130,7 @@ public class SimpCalcParser {
         }
     }
 
+    //Arg routine
     private void Arg(){
         if (tokens.get(0).equals("String")){
             tokens.remove(0);
@@ -131,6 +140,7 @@ public class SimpCalcParser {
         }
     }
 
+    //Iffollow routine
     private void Iffollow(){
         if (tokens.get(0).equals("Endif")){
             tokens.remove(0);
@@ -165,11 +175,13 @@ public class SimpCalcParser {
     }
 
     
+    //Exp routine
     private void Exp(){
         Trm();
         TrmFollow();
     }
 
+    //TrmFollow routine
     private void TrmFollow(){
         if (tokens.get(0).equals("Plus")){
             tokens.remove(0);
@@ -183,11 +195,13 @@ public class SimpCalcParser {
         }
     }
 
+    //Trm routine
     private void Trm(){
         Fac();
         FacFollow();
     }
 
+    //FacFollow routine
     private void FacFollow(){
         if (tokens.get(0).equals("Multiply")){
             tokens.remove(0);
@@ -201,11 +215,13 @@ public class SimpCalcParser {
         }
     }
 
+    //Fac routine
     private void Fac(){
         Lit();
         LitFollow();
     }
 
+    //LitFollow routine
     private void LitFollow(){
         if (tokens.get(0).equals("Raise")){
             tokens.remove(0);
@@ -214,6 +230,7 @@ public class SimpCalcParser {
         }
     }
 
+    //Lit routine
     private void Lit(){
         if (tokens.get(0).equals("Minus")){
             tokens.remove(0);
@@ -224,6 +241,7 @@ public class SimpCalcParser {
         }
     }
 
+    //Val routine
     private void Val(){
         if (tokens.get(0).equals("Identifier")){
             tokens.remove(0);
@@ -266,23 +284,27 @@ public class SimpCalcParser {
         }
     }
 
+    //Cnd routine
     private void Cnd(){
         Exp();
         Rel();
         Exp();
     }
 
+    //Rel routine
     private void Rel(){
-        if (tokens.get(0).equals("LessThan") || tokens.get(0).equals("Equal") || tokens.get(0).equals("GreaterThan") || 
+        if (tokens.get(0).equals("LessThan") || tokens.get(0).equals("=") || tokens.get(0).equals("GreaterThan") || 
         tokens.get(0).equals("GTEqual") || tokens.get(0).equals("NotEqual") || tokens.get(0).equals("LTEqual")){
             tokens.remove(0);
         }
         else {
+            System.out.println(tokens.get(0));
             out.println("Parse Error: Missing relational operator.");
             Error();
         }
     }
 
+    //When an error is found, this method is called which completes the output file and closes the program
     private void Error(){
         out.close();
         System.exit(0);

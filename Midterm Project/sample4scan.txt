@@ -78,5 +78,4 @@ Number  3
 Minus  -
 Number  4
 Plus  +
-Identifier  1
-[ "Identifier", "If", "Else", "Endif", "Sqrt", "Print", "And", "Or", "Not", "Number", "Number", "Error", "Lexical Error: Illegal character/character sequence", "Error", "Number", "Error", "Lexical Error: Invalid number format", "Error", "Error", "Lexical Error: Invalid number format", "Error", "Number", "Error", "Lexical Error: Illegal character/character sequence", "Error", "Number", "Number", "Plus", "Number", "Plus", "Number", "Error", "Lexical Error: Illegal character/character sequence", "Error", "Number", "Error", "Lexical Error: Illegal character/character sequence", "Error", "Error", "Lexical Error: Invalid number format", "Error", "Error", "Lexical Error: Illegal character/character sequence", "Error", "Number", "Identifier", "Plus", "Identifier", "String", "Semicolon", "Identifier", "Identifier", "Identifier", "Identifier", "Identifier", "Identifier", "Identifier", "Identifier", "Number", "Identifier", "Colon", "Semicolon", "=", "Assign", "Semicolon", "Colon", "Identifier", "Number", "Plus", "Number", "Plus", "Number", "Identifier", "Identifier", "Identifier", "Identifier", "Identifier", "Error", "Lexical Error: Illegal character/character sequence", "Error", "Number", "Raise", "Number", "Raise", "Number", "Number", "Minus", "Number", "Plus", "Identifier", "EndOfFile" ]
+Number  1

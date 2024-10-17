@@ -44,7 +44,6 @@ public class SimpCalcInput {
                 while( !myScanner.printStream().isEmpty() && myScanner.showError() ){
                     out.println(myScanner.gettoken()); //writes the token-lexeme pair to the output file
                 }
-                printTokens(myScanner.getTokenIDs(), out);
 
                 //Instantiation of the Parser, token types produced by the Scanner is passed as a parameter
                 myParser = new SimpCalcParser(myScanner.getTokenIDs(), parserFileName, fileName);
@@ -60,22 +59,8 @@ public class SimpCalcInput {
             
         } 
         catch (IOException e){
-            System.out.println("An error occurred."); //catches  any errors and displays an error message on the console
+            System.out.println("An error occurred."); //catches any errors and displays an error message on the console
         }
 
-    
     }
-
-    private static void printTokens(ArrayList<String> tokenIDs, PrintWriter out) {
-        // Format and print to the output file
-        out.print("[ ");
-        for (int i = 0; i < tokenIDs.size(); i++) {
-            out.print("\"" + tokenIDs.get(i) + "\"");
-            if (i < tokenIDs.size() - 1) {
-                out.print(", ");
-            }
-        }
-        out.println(" ]");
-    }
-
 }

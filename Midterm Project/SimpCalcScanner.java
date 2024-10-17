@@ -423,9 +423,9 @@ public class SimpCalcScanner {
             currentChar = inputStream.charAt(0); // Update current character
         }
     }
-
-    // Return the list of token IDs
-    public ArrayList<String> getTokenIDs() {
+    // Method to retrieve the list of token IDs
+    public ArrayList<String> getTokenIDs(){
+        tokenIDs.add("EndOfFile");
         return tokenIDs;
     }
 

@@ -27,9 +27,16 @@ public class SimpCalcParser {
     }
 
     //methods
-    private void Prg(){
+    public void Prg(){
         Blk();
-        EndOfFile();
+        if (tokens.get(0).equals("EndOfFile")){
+            out.println("Sample is a valid SimpCalc Program.");
+            out.close();
+        }
+        else {
+            out.println("End of file expected.");
+            Error();
+        }
     }
 
     private void Blk(){
@@ -47,65 +54,68 @@ public class SimpCalcParser {
                 Exp();
                 if (tokens.get(0).equals("Semicolon")){
                     tokens.remove(0);
-                    out.println("Statement Recognized");
+                    out.println("Statement Recognized.");
                 }
                 else {
-                    out.println("Semicolon expected.");
+                    out.println("Parse Error: Semicolon expected.");
+                    Error();
                 }
             }
             else {
-                out.println("Assign expected.");
+                out.println("Parse Error: Assign expected.");
+                Error();
             }
         }
         else if (tokens.get(0).equals("Print")){
             tokens.remove(0);
-            if (tokens.get(0).equals("(")){
+            if (tokens.get(0).equals("LeftParen")){
                 tokens.remove(0);
                 Arg();
                 ArgFollow();
-                if (tokens.get(0).equals(")")){
+                if (tokens.get(0).equals("RightParen")){
                     tokens.remove(0);
                     if (tokens.get(0).equals("Semicolon")){
                         tokens.remove(0);
-                        out.println("Print Statement Recognized");
+                        out.println("Print Statement Recognized.");
                     }
                     else {
-                        out.println("Semicolon expected.");
+                        out.println("Parse Error: Semicolon expected.");
+                        Error();
                     }
                 }
                 else {
-                    out.println("Closing parenthesis expected.");
+                    out.println("Parse Error: RightParen expected.");
+                    Error();
                 }
             }
             else {
-                out.println("Opening parenthesis expected.");
+                out.println("Parse Error: LeftParen expected.");
+                Error();
             }
         }
         else if (tokens.get(0).equals("If")){
             tokens.remove(0);
             out.println("If Statement Begins");
             Cnd();
-            if (tokens.get(0).equals(":")){
+            if (tokens.get(0).equals("Colon")){
                 tokens.remove(0);
                 Blk();
                 Iffollow();
-                out.println("If Statement Ends");
+                out.println("If Statement Ends.");
             }
             else {
-                out.println("Colon expected.");
+                out.println("Parse Error: Colon expected.");
+                Error();
             }
         }
         else {
-            StmError();
+            out.print("Invalid Statement");
+            Error();
         }
     }
 
-    private void StmError(){
-        out.print("Invalid Statement");
-    }
-
     private void ArgFollow(){
-        if (tokens.get(0).equals(",")){
+        if (tokens.get(0).equals("Comma")){
             tokens.remove(0);
             Arg();
             ArgFollow();
@@ -144,16 +154,16 @@ public class SimpCalcParser {
                 }
             }
             else {
-                out.println("Incomplete if Statement");
+                out.println("Parse Error: Endif expected");
+                Error();
             }
         }
         else {
-            IffollowError();
+            out.println("Parse Error: Incomplete if Statement");
+            Error();
         }
     }
 
-    private void IffollowError(){
-    }
     
     private void Exp(){
         Trm();
@@ -170,8 +180,6 @@ public class SimpCalcParser {
             tokens.remove(0);
             Trm();
             TrmFollow();
-        }
-        else {
         }
     }
 
@@ -191,8 +199,6 @@ public class SimpCalcParser {
             Fac();
             FacFollow();
         }
-        else {
-        }
     }
 
     private void Fac(){
@@ -205,8 +211,6 @@ public class SimpCalcParser {
             tokens.remove(0);
             Lit();
             LitFollow();
-        }
-        else {
         }
     }
 
@@ -229,36 +233,37 @@ public class SimpCalcParser {
         }
         else if (tokens.get(0).equals("Sqrt")){
             tokens.remove(0);
-            if (tokens.get(0).equals("(")){
+            if (tokens.get(0).equals("LeftParen")){
                 tokens.remove(0);
                 Exp();
-                if (tokens.get(0).equals(")")){
+                if (tokens.get(0).equals("RightParen")){
                     tokens.remove(0);
                 }
                 else {
-                    out.println("Closing parenthesis expected");
+                    out.println("Parse Error: RightParen expected.");
+                    Error();
                 }
             }
             else {
-                out.println("Opening parenthesis expected");
+                out.println("Parse Error: LeftParen expected.");
+                Error();
             }
         }
-        else if (tokens.get(0).equals("(")){
+        else if (tokens.get(0).equals("LeftParen")){
             tokens.remove(0);
             Exp();
-            if (tokens.get(0).equals(")")){
+            if (tokens.get(0).equals("RightParen")){
                 tokens.remove(0);
             }
             else {
-                out.println("Closing parenthesis expected");
+                out.println("Parse Error: RightParen expected.");
+                Error();
             }
         }
         else {
-            ValError();
+            out.println("Parse Error: Value error.");
+            Error();
         }
-    }
-
-    private void ValError(){
     }
 
     private void Cnd(){
@@ -273,15 +278,14 @@ public class SimpCalcParser {
             tokens.remove(0);
         }
         else {
-            RelError();
+            out.println("Parse Error: Missing relational operator.");
+            Error();
         }
     }
 
-    private void RelError(){
-    }
-
-    private void EndOfFile(){
-
+    private void Error(){
+        out.close();
+        System.exit(0);
     }
 
 }

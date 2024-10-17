@@ -22,6 +22,7 @@ public class ScannerInput {
         String a = scanner.next(); //store the input into a string variable called 'a'
 
         SimpCalcScanner myScanner = new SimpCalcScanner(a); //creating a new SimpCalcScanner object that makes use of the input string
+        SimpCalcParser myParser;
 
         try {
             File output = new File("output.txt"); //creates a new file for the output from the scannerDFA
@@ -33,7 +34,11 @@ public class ScannerInput {
                     out.println(myScanner.printTokenLexeme()); //writes the token-lexeme pair to the output file
                 }
                 printTokens(myScanner.getTokenIDs(), out);
+                myParser = new SimpCalcParser(myScanner.getTokenIDs());
+
                 out.close(); //close the PrintWriter after the writing is over
+
+                myParser.Prg();
             }
             else {
                 System.out.println("An output file already exists. Please delete the current output file."); //if another output file exists, tells the user to delete it first 

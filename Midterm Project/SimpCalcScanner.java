@@ -341,6 +341,7 @@ public class SimpCalcScanner {
     }
     // Method to retrieve the list of token IDs
     public ArrayList<String> getTokenIDs(){
+        tokenIDs.add("EndOfFile");
         return tokenIDs;
     }
 

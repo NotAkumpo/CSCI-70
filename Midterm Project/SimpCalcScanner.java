@@ -1,28 +1,27 @@
 import java.util.ArrayList;
+
 public class SimpCalcScanner {
 
-    //fields
-    //all necessary variables needed by the DFA is stored in the class fields
+    // Class variables
+    private String inputStream;    // Input string to be tokenized
+    private char currentChar;      // Current character being processed
+    private String currentToken;   // Current token being built
+    private String currentState;   // Current DFA state
+    private boolean noError;       // Error flag to track if there's been an error
+    private boolean ongoingDFA;    // DFA running state flag
+    private ArrayList<String> tokenIDs;   // List to store identified tokens
+    private int currentLine = 1;   // Track line numbers for error reporting
 
-    private String inputStream; //everything in the input
-    private char currentChar; //current character being pointed at
-    private String currentToken; //current token being produced
-    private String currentState; //current state of the scanner
-    private boolean noError; //checks if an error occurs where an invalid character is read
-    private boolean ongoingDFA; //boolean to keep track of being in a final state
-    private ArrayList<String> tokenIDs; //list to store token IDs
-
-    //constructor
-    //fields are initialized here and the input stream is fed the input
-
-    public SimpCalcScanner(String inputStream){
-        this.inputStream = inputStream.replaceAll("\\s+", "");
-        //currentChar = inputStream.charAt(0);
+    // Constructor to initialize with an input stream
+    public SimpCalcScanner(String inputStream) {
+        this.inputStream = inputStream;
+        // Set currentChar to the first character in the input stream
         if (this.inputStream.length() > 0) {
             currentChar = this.inputStream.charAt(0);
         } else {
-            currentChar = '\0'; // End of input
+            currentChar = '\0';  // End of input character
         }
+        // Initialize other variables
         currentState = "A";
         noError = true;
         currentToken = "";
@@ -30,323 +29,417 @@ public class SimpCalcScanner {
         tokenIDs = new ArrayList<>();
     }
 
-
-    //methods
-    //returns the input stream
-    public String printStream(){
+    // Method to return the input stream
+    public String printStream() {
         return inputStream;
     }
 
-    //checks if theres an error so far
-    public boolean showError(){
+    // Method to return if there is an error
+    public boolean showError() {
         return noError;
     }
 
-    /*The runDFA() function processes the current character in the input stream, starting 
-    from the initial state "A" and transitioning to the appropriate state based on the character 
-    type (e.g., digit, '=', '+', '-'). */ 
-    public void runDFA(){
-        switch(currentState){
+    // Main DFA logic for tokenizing the input
+    public void runDFA() {
+        switch (currentState) {
+            // Initial state, handles whitespace, comments, and operators
             case "A":
-                if (Character.isDigit(currentChar)){ // handles digit characters
-                    updateDFA(); // updates the DFA state and moves on to the next character
-                    currentState = "J";
+                // Handle whitespace and new lines
+                if (Character.isWhitespace(currentChar)) {
+                    if (currentChar == '\n') currentLine++;  // Track line numbers for errors
+                    updateDFA();
                     break;
                 }
-                else { // handles non-digit characters
-                    switch(currentChar){
-                        case '=':
-                            updateDFA(); 
+
+                // Handle comments
+                if (currentChar == '/') {
+                    updateDFA();
+                    if (currentChar == '/') {
+                        skipComment();  // Skip the entire comment
+                        currentState = "A";
+                        break;
+                    } else {
+                        currentState = "Divide";  // It's a division operator
+                        ongoingDFA = false;
+                        break;
+                    }
+                }
+
+                // Handle digits (numbers)
+                if (Character.isDigit(currentChar)) {
+                    updateDFA();
+                    currentState = "J"; // Number state
+                } 
+                // Handle letters (identifiers/keywords)
+                else if (Character.isLetter(currentChar) || currentChar == '_') {
+                    updateDFA();
+                    currentState = "G"; // Identifier/Keyword state
+                } 
+                // Handle other operators and delimiters
+                else {
+                    switch (currentChar) {
+                        case '=': // Assignment operator
+                            updateDFA();
                             currentState = "Equal";
-                            ongoingDFA = false; // end DFA process and moves on to next token
+                            ongoingDFA = false;
                             break;
-                        case '+':
+                        case '+': // Plus operator
                             updateDFA();
                             currentState = "Plus";
-                            ongoingDFA = false; 
+                            ongoingDFA = false;
                             break;
-                        case '-':
+                        case '-': // Minus operator
                             updateDFA();
                             currentState = "Minus";
                             ongoingDFA = false;
                             break;
-                        case ':':
+                        case ':': // Start of assignment (:=)
                             updateDFA();
-                            currentState = "B"; // move to state where = is possible
+                            currentState = "B";
                             break;
-                        case ';':
+                        case ';': // Semicolon
                             updateDFA();
                             currentState = "Semicolon";
                             ongoingDFA = false;
                             break;
-                        case ',':
+                        case ',': // Comma
                             updateDFA();
                             currentState = "Comma";
                             ongoingDFA = false;
                             break;
-                        case '(':
+                        case '(': // Left parenthesis
                             updateDFA();
                             currentState = "LeftParen";
                             ongoingDFA = false;
                             break;
-                        case ')':
+                        case ')': // Right parenthesis
                             updateDFA();
                             currentState = "RightParen";
                             ongoingDFA = false;
                             break;
-                        case '*':
+                        case '*': // Multiply or exponentiation
                             updateDFA();
-                            currentState = "C";
+                            currentState = "C"; // Check for multiplication or exponentiation
                             break;
-                        case '/':
+                        case '<': // Less than operator
                             updateDFA();
-                            currentState = "H";
+                            currentState = "D"; // Less than state
                             break;
-                        case '<':
+                        case '>': // Greater than operator
                             updateDFA();
-                            currentState = "D";
+                            currentState = "E"; // Greater than state
                             break;
-                        case '>':
+                        case '!': // Not equal operator
                             updateDFA();
-                            currentState = "E";
+                            currentState = "F"; // Not equal state
                             break;
-                        case '!':
+                        case '\"': // Start of a string
                             updateDFA();
-                            currentState = "F";
+                            currentState = "I"; // String state
                             break;
-                        default:
-                            noError = false;
-                            ongoingDFA = false;
+                        default: // Unrecognized character
+                            addError("Illegal character/character sequence");
+                            updateDFA(); // Skip the problematic character
+                            currentState = "A"; // Reset state to continue
                             break;
                     }
-                    break;
-                }
-            case "B":
-                switch(currentChar){
-                    case '=':
-                        updateDFA();
-                        currentState = "Assign";
-                        ongoingDFA = false;
-                        break;
-                    default:
-                        currentState = "Colon";
-                        ongoingDFA = false;
-                        break;
                 }
                 break;
-            case "C":
-                switch(currentChar){
-                    case '*':
-                        updateDFA();
-                        currentState = "Raise";
-                        ongoingDFA = false;
-                        break;
-                    default:
-                        currentState = "Multiply";
-                        ongoingDFA = false;
-                        break;
+
+            // Handle various states for multi-character operators
+            case "B": // Assignment state (colon)
+                if (currentChar == '=') {
+                    updateDFA();
+                    currentState = "Assign";
+                    ongoingDFA = false;
+                } else {
+                    currentState = "Colon";
+                    ongoingDFA = false;
                 }
                 break;
-            case "D":
-                switch(currentChar){
-                    case '=':
-                        updateDFA();
-                        currentState = "LTEqual";
-                        ongoingDFA = false;
-                        break;
-                    default:
-                        currentState = "LessThan";
-                        ongoingDFA = false;
-                        break;
-                } 
+
+            case "C": // Multiplication or exponentiation
+                if (currentChar == '*') {
+                    updateDFA();
+                    currentState = "Raise"; // Exponentiation
+                    ongoingDFA = false;
+                } else {
+                    currentState = "Multiply"; // Multiplication
+                    ongoingDFA = false;
+                }
                 break;
-            case "E":
-                switch(currentChar){
-                    case '=':
-                        updateDFA();
-                        currentState = "GTEqual";
-                        ongoingDFA = false;
-                        break;
-                    default:
-                        currentState = "GreaterThan";
-                        ongoingDFA = false;
-                        break;
-                } 
-                break; 
+
+            // Handle less than/greater than cases
+            case "D": // Less than
+                if (currentChar == '=') {
+                    updateDFA();
+                    currentState = "LTEqual"; // Less than or equal to
+                    ongoingDFA = false;
+                } else {
+                    currentState = "LessThan"; // Just less than
+                    ongoingDFA = false;
+                }
+                break;
+
+            case "E": // Greater than
+                if (currentChar == '=') {
+                    updateDFA();
+                    currentState = "GTEqual"; // Greater than or equal to
+                    ongoingDFA = false;
+                } else {
+                    currentState = "GreaterThan"; // Just greater than
+                    ongoingDFA = false;
+                }
+                break;
+
+            // Handle "!=" (not equal) case
             case "F":
-                switch(currentChar){
-                    case '=':
-                        updateDFA();
-                        currentState = "NotEqual";
-                        ongoingDFA = false;
-                        break;
-                    default:
-                        noError = false;
-                        ongoingDFA = false;
-                } 
-                break;              
-            case "H":
-                switch(currentChar){
-                    case '/':
-                        updateDFA();
-                        while (currentChar != '\n' && inputStream.length() > 0) {
-                            updateDFA();
-                        }
-                        ongoingDFA = false;
-                        break;
-                    default:
-                        currentState = "Divide";
-                        ongoingDFA = false;
-                        break;
+                if (currentChar == '=') {
+                    updateDFA();
+                    currentState = "NotEqual"; // Not equal to
+                    ongoingDFA = false;
+                } else {
+                    addError("Invalid sequence"); // Invalid character after '!'
+                    updateDFA(); // Skip the problematic character
+                    currentState = "A"; // Reset to continue
                 }
                 break;
-            case "J":
-                // if character is still a digit
-                if (Character.isDigit(currentChar)){
-                    updateDFA();
-                    currentState = "J";
-                    break;
-                }
-                // if character is e, E
-                if (currentChar == 'e' || currentChar == 'E'){
-                    updateDFA();
-                    currentState = "M";
-                    break;
-                }
-                // if character is .
-                if (currentChar == '.'){
-                    updateDFA();
-                    currentState = "K";
-                    break;
-                }
-                // other
-                else {
-                    ongoingDFA = false;
-                    currentState = "Number";
-                    break;
-                }
-                
-            case "K": // float pt. 1
-                // if character is a digit
-                if (Character.isDigit(currentChar)){
-                    updateDFA();
-                    currentState = "L";
-                    break;
-                }
-                // if there's no digit after the decimal
-                else {
-                    noError = false; // error: no digit after decimal
-                    ongoingDFA = false;
-                    break;
-                }
 
-            case "L": // float pt. 2
-                // if character is digit
-                if (Character.isDigit(currentChar)){
+            // Handle identifier/keyword
+            case "G": // Identifier or keyword
+                if (Character.isLetter(currentChar) || Character.isDigit(currentChar) || currentChar == '_') {
                     updateDFA();
-                    currentState = "L";
-                    break;
-                } 
-                // if character is e, E
-                if (currentChar == 'e' || currentChar == 'E'){
-                    updateDFA();
-                    currentState = "M";
-                    break;
+                    currentState = "G"; // Continue identifier
+                } else {
+                    currentToken = currentToken.trim(); // Remove extra spaces
+                    ongoingDFA = false; // End identifier token
+                    if (isKeyword(currentToken)) { // Check if it's a keyword
+                        currentState = getKeywordToken(currentToken); 
+                    } else {
+                        currentState = "Identifier"; // Otherwise, it's an identifier
+                    }
                 }
-                // other
-                else {
+                break;
+
+            // Handle string literals
+            case "I": // String state
+                if (currentChar != '\"' && currentChar != '\n' && currentChar != '\0') { // Valid string character
+                    updateDFA();
+                } else if (currentChar == '\"') { // End of string
+                    updateDFA();
                     ongoingDFA = false;
+                    currentState = "String"; // Valid string token
+                } else { // Unterminated string
+                    addError("Unterminated string"); // Unterminated error
+                    updateDFA(); // Skip to the next token
+                    currentState = "A"; // Reset state to continue
+                }
+                break;
+
+            // Handle numeric tokens
+            case "J": // Numeric state
+                if (Character.isDigit(currentChar)) {
+                    updateDFA();
+                    currentState = "J"; // Continue with number
+                } else if (currentChar == 'e' || currentChar == 'E') { // Exponent
+                    updateDFA();
+                    currentState = "M"; // Exponent state
+                } else if (currentChar == '.') { // Decimal point
+                    updateDFA();
+                    currentState = "K"; // Decimal number state
+                } else {
+                    ongoingDFA = false; // End number token
                     currentState = "Number";
-                    break;
                 }
-            case "M": // exponent
-                // if character is -, +
-                if (currentChar == '-' || currentChar == '+'){
+                break;
+
+            // Handle decimal number state
+            case "K": 
+                if (Character.isDigit(currentChar)) {
                     updateDFA();
-                    currentState = "N";
-                    break;
+                    currentState = "L"; // Decimal number
+                } else {
+                    addError("Invalid number format"); // Error for invalid number
+                    updateDFA(); // Skip character
+                    currentState = "A"; // Reset state
                 }
-                // if character is a digit
-                if (Character.isDigit(currentChar)){
+                break;
+
+            // Handle exponents
+            case "L": // After decimal
+                if (Character.isDigit(currentChar)) {
                     updateDFA();
-                    currentState = "O";
-                    break;
-                }
-                // if there's no digit after e, E
-                else {
-                    noError = false; // error: no digit after e, E
+                    currentState = "L"; // Continue decimal number
+                } else if (currentChar == 'e' || currentChar == 'E') { // Handle exponent
+                    updateDFA();
+                    currentState = "M"; // Exponent state
+                } else {
                     ongoingDFA = false;
-                    break;
+                    currentState = "Number"; // End number token
                 }
-            case "N": // exponent pt. 2
-                // if character is a digit
-                if (Character.isDigit(currentChar)){
+                break;
+
+            // Handle exponent part
+            case "M": 
+                if (currentChar == '+' || currentChar == '-') { // Exponent sign
                     updateDFA();
-                    currentState = "O";
-                    break;
-                }
-                // if there's no digit after -, +
-                else {
-                    noError = false; // error: no digit after -, +
-                    ongoingDFA = false;
-                    break;
-                }
-            case "O": // exponent pt. 3
-                if (Character.isDigit(currentChar)){
+                    currentState = "N"; // Signed exponent
+                } else if (Character.isDigit(currentChar)) {
                     updateDFA();
-                    currentState = "O";
-                    break;
+                    currentState = "O"; // Exponent number
+                } else {
+                    addError("Invalid number format"); // Error for bad exponent
+                    updateDFA(); // Skip character
+                    currentState = "A"; // Reset state
                 }
-                else {
+                break;
+
+            // Handle signed exponent
+            case "N":
+                if (Character.isDigit(currentChar)) {
+                    updateDFA();
+                    currentState = "O"; // Exponent digits
+                } else {
+                    addError("Invalid number format"); // Error for invalid sign
+                    updateDFA(); // Skip character
+                    currentState = "A"; // Reset state
+                }
+                break;
+
+            // Finalize the exponent part
+            case "O": 
+                if (Character.isDigit(currentChar)) {
+                    updateDFA();
+                    currentState = "O"; // Continue exponent
+                } else {
                     ongoingDFA = false;
-                    currentState = "Number";
-                    break;
+                    currentState = "Number"; // End of number
                 }
+                break;
+
+            default: 
+                addError("Unknown token"); // Unknown token encountered
+                updateDFA(); // Skip the problematic character
+                currentState = "A"; // Reset state to continue
+                break;
         }
-    }
-    // This method gets the current token lexeme as a string
-    public String printTokenLexeme(){
-        ongoingDFA = true;
-        currentState = "A";
-        currentToken = "";
-        String tokenLexeme;
-        // Runs the DFA until input is empty or moving on to next token
-        while (ongoingDFA && !inputStream.isEmpty()){
-            runDFA();
-        }
-        // Error message
-        if (!noError){
-            tokenLexeme = "Lexical Error reading character \"" + Character.toString(currentChar) + "\"";
-            tokenIDs.add("Error"); 
-        } 
-        else { 
-            tokenLexeme = currentState + "  " + currentToken; 
-            tokenIDs.add(getTokenID());
-        }
-        return tokenLexeme;
     }
 
-    // This method consumes the current character and updates the DFA
-    public void updateDFA(){
-        //add current character to token
-        currentToken += currentChar;
-        if (inputStream.length() > 0){
-            //consume current character
-            inputStream = inputStream.substring(1);
+    // Skip over comments in the input
+    public void skipComment() {
+        while (currentChar != '\n' && inputStream.length() > 0) {
+            inputStream = inputStream.substring(1); // Remove comment characters
+            if (inputStream.length() > 0) {
+                currentChar = inputStream.charAt(0); // Update current character
+            }
         }
-        if (inputStream.length() > 0){
-            //point at new current character
-            currentChar = inputStream.charAt(0);
+        if (inputStream.length() > 0) {
+            inputStream = inputStream.substring(1); // Move past newline after comment
+            if (inputStream.length() > 0) {
+                currentChar = inputStream.charAt(0); // Update current character
+            }
+        }
+        currentToken = ""; // Clear the current token
+    }
+
+    // Check if a token is a keyword
+    public boolean isKeyword(String token) {
+        return token.equals("IF") || token.equals("PRINT") || token.equals("ELSE") || token.equals("ENDIF") ||
+               token.equals("SQRT") || token.equals("AND") || token.equals("OR") || token.equals("NOT");
+    }
+
+    // Return the keyword token's state
+    public String getKeywordToken(String token) {
+        switch (token) {
+            case "IF":
+                return "If";
+            case "PRINT":
+                return "Print";
+            case "ELSE":
+                return "Else";
+            case "ENDIF":
+                return "Endif";
+            case "SQRT":
+                return "Sqrt";
+            case "AND":
+                return "And";
+            case "OR":
+                return "Or";
+            case "NOT":
+                return "Not";
+            default:
+                return "Identifier"; // Return identifier if it's not a keyword
         }
     }
-    // Method to retrieve the list of token IDs
-    public ArrayList<String> getTokenIDs(){
+
+    // Print the token and lexeme
+    public String printTokenLexeme() {
+        ongoingDFA = true; // Reset DFA flag
+        currentState = "A"; // Reset state to the start
+        currentToken = ""; // Clear current token
+        String tokenLexeme; // Output token-lexeme pair
+        
+        // Process tokens until DFA finishes or input stream is empty
+        while (ongoingDFA && !inputStream.isEmpty()) {
+            runDFA(); // Run DFA to process next character
+        }
+
+        // If input is exhausted but there’s still a token being processed
+        if (inputStream.isEmpty() && !currentToken.isEmpty() && ongoingDFA) {
+            if (isKeyword(currentToken)) {
+                currentState = getKeywordToken(currentToken); // Set state to keyword
+            } else {
+                currentState = "Identifier"; // Otherwise, it's an identifier
+            }
+            ongoingDFA = false; // End token processing
+        }
+
+        // Check for errors and return appropriate output
+        if (!noError) {
+            // Fetch the latest error message for output
+            int lastIndex = tokenIDs.size() - 1;
+            String lastError = tokenIDs.get(lastIndex); // Get the latest error message
+            
+            // Add error to token lexeme
+            tokenLexeme = lastError + "\nError";
+            tokenIDs.add("Error"); // Add error to token list
+            noError = true; // Reset error flag
+        } else {
+            // No error, return the state and token
+            tokenLexeme = currentState + "  " + currentToken.trim();
+            tokenIDs.add(getTokenID()); // Add token ID
+        }
+
+        return tokenLexeme; // Return the token lexeme pair
+    }
+
+    // Update the DFA state by consuming the current character
+    public void updateDFA() {
+        currentToken += currentChar; // Add current character to token
+        if (inputStream.length() > 0) {
+            inputStream = inputStream.substring(1); // Remove the first character from input
+        }
+        if (inputStream.length() > 0) {
+            currentChar = inputStream.charAt(0); // Update current character
+        }
+    }
+
+    // Return the list of token IDs
+    public ArrayList<String> getTokenIDs() {
         return tokenIDs;
     }
 
-    // Helper method to map currentState to token ID strings
-    private String getTokenID(){
-        switch(currentState){
+    // Add an error message to the token list
+    private void addError(String errorMessage) {
+        tokenIDs.add("Error"); // Add generic error
+        tokenIDs.add("Lexical Error: " + errorMessage + " (line #" + currentLine + ")"); // Detailed error
+        noError = false; // Set error flag to true
+        ongoingDFA = false; // End current token processing
+    }
+
+    // Get the token ID based on the current DFA state
+    private String getTokenID() {
+        switch (currentState) {
             case "Equal":
                 return "=";
             case "Plus":
@@ -367,24 +460,44 @@ public class SimpCalcScanner {
                 return "Multiply";
             case "Divide":
                 return "Divide";
-            case "LTEqual":
-                return "LTEqual";
-            case "LessThan":
-                return "LessThan";
+            case "Raise":
+                return "Raise";
             case "GTEqual":
                 return "GTEqual";
+            case "LTEqual":
+                return "LTEqual";
             case "GreaterThan":
                 return "GreaterThan";
+            case "LessThan":
+                return "LessThan";
             case "NotEqual":
                 return "NotEqual";
             case "Number":
                 return "Number";
             case "Assign":
                 return "Assign";
-            case "Raise":
-                return "Raise";
+            case "If":
+                return "If";
+            case "Print":
+                return "Print";
+            case "Else":
+                return "Else";
+            case "Endif":
+                return "Endif";
+            case "Sqrt":
+                return "Sqrt";
+            case "And":
+                return "And";
+            case "Or":
+                return "Or";
+            case "Not":
+                return "Not";
+            case "Identifier":
+                return "Identifier";
+            case "String":
+                return "String";
             default:
-                return "Unknown";
+                return "Unknown"; // Return "Unknown" for unrecognized tokens
         }
     }
 }

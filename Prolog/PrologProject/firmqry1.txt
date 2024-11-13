@@ -1,0 +1,11 @@
+employee(martha).
+employee(Employee).
+works(Employee, marketing).
+departmentMates(julia,jack).
+departmentMates(julia,martha).
+isAssigned(john, proj2).
+assigned(martha, Project).
+projectMates(martha, josh).
+assigned(Employee, proj1).
+works(_, Department).
+hasWorkers(marketing).

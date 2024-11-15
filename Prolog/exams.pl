@@ -14,7 +14,8 @@ studied(mary, midterm).
 studied(john, quiz2).
 
 easy(quiz1).
+notEasy(quiz2).
 easy(quiz3).
 
 willPass(S, T) :- easy(T).
-willPass(S, T) :- \+ easy(T), studied(S, T).
+willPass(S, T) :- notEasy(T), studied(S, T).

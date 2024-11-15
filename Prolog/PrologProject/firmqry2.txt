@@ -1,0 +1,6 @@
+status(proj3, Status).
+head(marketing, Head).
+isBusy(marketing),!.
+isBusy(sales),!.
+isEfficient(jack),!.
+isEfficient(martha),!.

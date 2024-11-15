@@ -23,5 +23,4 @@ married(X,A).
 aORuMarr(C, A) :- aORuDirect(C,X),
 married(A,X).
 
-aORu(C,A) :- aORuDirect(C,A).
-aORu(C,A) :- aORuMarr(C,A).
+aORu(C,A) :- aORuDirect(C,A); aORuMarr(C,A).

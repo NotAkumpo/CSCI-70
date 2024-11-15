@@ -3,9 +3,10 @@ employee(Employee).
 works(Employee, marketing).
 departmentMates(julia,jack).
 departmentMates(julia,martha).
-isAssigned(john, proj2).
+assigned(john, proj2).
 assigned(martha, Project).
 projectMates(martha, josh).
 assigned(Employee, proj1).
-works(_, Department).
-hasWorkers(marketing).
+setof(Department, E^works(E, Department), Departments).
+works(_, marketing),!.
+works(_, accounting).

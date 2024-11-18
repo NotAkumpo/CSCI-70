@@ -31,4 +31,3 @@ assigned(jack, proj3).
 
 departmentMates(X, Y) :- works(X, D), works(Y, D), X \= Y.
 projectMates(X, Y) :- assigned(X, P), assigned(Y, P), X \= Y.
-hasWorkers(D) :- works(_, D).
